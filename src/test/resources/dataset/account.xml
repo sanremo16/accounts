@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dataset>
+    <account id="100" balance="10.00" num="11111111111111111111" currency="RUR"/>
+    <account id="200" balance="20.00" num="22222222222222222222" currency="RUR"/>
+</dataset>

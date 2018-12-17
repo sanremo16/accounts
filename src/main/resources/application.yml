@@ -1,0 +1,33 @@
+spring:
+    jpa:
+        generate-ddl: true
+        database: h2
+        show-sql: true
+        hibernate:
+            ddl-auto: create
+
+    #data:
+    #   jdbc:
+    #        repositories:
+    #            enabled: true
+    datasource:
+        name: accounts
+        url: jdbc:h2:mem:mydb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS accounts
+        data: classpath:/sql/data.sql
+    h2:
+        console:
+            enabled: true
+            path: /console
+    application:
+        name: accounts
+server:
+    port: 8082
+    undertow:
+        ioThreads: 15
+        workerThreads: 150
+        accesslog:
+            enabled: true
+    compression:
+        enabled: true
+        mimeTypes: text/xml, text/css, text/html, application/json
+        minResponseSize: 4096
