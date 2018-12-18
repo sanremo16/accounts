@@ -1,5 +1,6 @@
 package org.san.home.accounts.dto;
 
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -12,10 +13,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DtoMapper extends ModelMapper {
+
     private static final Converter<MoneyDto, Money> DTO_TO_MONEY = new Converter<MoneyDto, Money>() {
         public Money convert(MappingContext<MoneyDto, Money> context) {
             MoneyDto dto = context.getSource();
-            Money money = Money.ofMajor(dto.getCurrencyType().getCurrencyUnit(), dto.getMajor());
+            Money money = Money.ofMajor(CurrencyUnit.of(CurrencyType.RUR.getIso()), dto.getMajor());
             return money.plusMinor(dto.getMinor());
         }
     };
@@ -24,7 +26,6 @@ public class DtoMapper extends ModelMapper {
         public MoneyDto convert(MappingContext<Money, MoneyDto> context) {
             Money money = context.getSource();
             MoneyDto dto = new MoneyDto();
-            dto.setCurrencyType(CurrencyType.valueOf(money.getCurrencyUnit().getCode()));
             dto.setMajor(money.getAmountMajorInt());
             dto.setMinor(money.getMinorPart());
             return dto;

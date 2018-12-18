@@ -13,13 +13,19 @@ import java.util.Optional;
  */
 public interface AccountService {
 
-    @NotNull Optional<Account> getByAccountNumber(@NotNull String accountNumber);
+    @NotNull Account getByAccountNumber(@NotNull String accountNumber);
 
     List<Account> findAll();
 
-    Account withdraw(@NotNull String accNumber, @NotNull Money money);
+    @NotNull Account add(@NotNull Account account);
 
-    Account topUp(@NotNull String accNumber, @NotNull Money money);
+    @NotNull Account update(@NotNull Account account);
 
-    Account transfer(@NotNull String srcAccNumber, @NotNull String dstAccNumber, @NotNull Money money);
+    void delete(@NotNull String accNumber);
+
+    @NotNull Account withdraw(@NotNull String accNumber, @NotNull Money money);
+
+    @NotNull Account topUp(@NotNull String accNumber, @NotNull Money money);
+
+    @NotNull Account transfer(@NotNull String srcAccNumber, @NotNull String dstAccNumber, @NotNull Money money);
 }

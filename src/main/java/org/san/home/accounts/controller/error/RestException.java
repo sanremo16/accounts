@@ -31,12 +31,6 @@ public class RestException extends CommonException {
         this(errorCode, cause, EMPTY);
     }
 
-    /**
-     * Формирование исключения
-     *
-     * @param errorCode код исключения
-     * @param cause         исключение, являющееся причиной для данного
-     */
     public RestException(ErrorCode errorCode, Throwable cause, ErrorArgument... args) {
         this(errorCode, cause, Arrays.asList(args));
     }

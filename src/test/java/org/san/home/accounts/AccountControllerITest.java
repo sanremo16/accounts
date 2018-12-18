@@ -4,6 +4,7 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.san.home.accounts.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,9 +15,12 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -37,11 +41,14 @@ public class AccountControllerITest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private AccountService accountService;
+
 
     @Test
     @DatabaseSetup({"/dataset/account.xml"})
     public void getAll() throws Exception {
-        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts")).andDo(print())
+        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/list")).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].id", containsInAnyOrder(100, 200)));
@@ -50,9 +57,17 @@ public class AccountControllerITest {
     @Test
     @DatabaseSetup({"/dataset/account.xml"})
     public void getByAccNum() throws Exception {
-        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/11111111111111111111")).andDo(print())
+        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/show/11111111111111111111")).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(100)));
+    }
+
+    @Test
+    @DatabaseSetup({"/dataset/account.xml"})
+    public void delete() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("http://localhost:"+ port + "/accounts/delete/11111111111111111111")).andDo(print())
+                .andExpect(status().isOk());
+        assertEquals(1, accountService.findAll().size());
     }
 
     @Test

@@ -19,12 +19,10 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select a from Account a where a.id= :id")
-    <S extends Account> Optional<S> findOneForUpdate(@Param("id") Long id);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from Account a where a.num= :num")
     <S extends Account> Optional<S> findOneByNumForUpdate(@Param("num") String num);
 
     <S extends Account> Collection<S> findByNum(@Param("num") String num);
+
+    void deleteByNum(@Param("num") String num);
 }

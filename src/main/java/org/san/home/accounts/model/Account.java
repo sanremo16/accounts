@@ -23,13 +23,14 @@ public class Account {
 
     @Id
     @Getter
+    @Setter
     @GeneratedValue
     private Long id;
 
     @NotNull
     @Getter
     @Setter
-    @Length(min = 20, max = 20)
+    @Length(min = 3, max = 20)
     @Column(name = "num")
     private String num;
 
@@ -43,12 +44,6 @@ public class Account {
     @Enumerated(EnumType.STRING)
     @Column(name = "currency")
     protected CurrencyType currency;
-
-
-    /*@NotNull
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private Client client;*/
 
     public Account(Long l, String s, Money money) {
         id = l;
