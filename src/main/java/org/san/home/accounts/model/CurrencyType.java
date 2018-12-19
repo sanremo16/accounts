@@ -24,4 +24,6 @@ public enum CurrencyType {
     public String toString() {
         return iso;
     }
+
+
 }

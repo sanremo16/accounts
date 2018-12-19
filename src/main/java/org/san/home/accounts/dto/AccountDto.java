@@ -1,7 +1,9 @@
 package org.san.home.accounts.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.san.home.accounts.model.CurrencyType;
 
@@ -9,6 +11,8 @@ import org.san.home.accounts.model.CurrencyType;
  * @author sanremo16
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Slf4j
 public class AccountDto {
     @ApiModelProperty(notes = "The database generated account ID")
@@ -16,7 +20,7 @@ public class AccountDto {
     @ApiModelProperty(notes = "Account number")
     private String num;
     @ApiModelProperty(notes = "Currency type by ISO code")
-    private CurrencyType currencyType;
+    private String currencyType;
     @ApiModelProperty(notes = "Account balance")
     private MoneyDto balance;
 }

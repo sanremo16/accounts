@@ -16,7 +16,8 @@ public enum ErrorCode {
     TOO_MANY_ACCOUNTS(9, "too_many_accounts"),
     ADD_ACCOUNT_FAILED(10, "add_account_failed"),
     UPDATE_ACCOUNT_FAILED(11, "update_account_failed"),
-    DELETE_ACCOUNT_FAILED(12, "delete_account_failed");
+    DELETE_ACCOUNT_FAILED(12, "delete_account_failed"),
+    UNSUPPORTED_CURRENCY(13, "unsupported_currency");
 
     private Integer code;
     private String name;
