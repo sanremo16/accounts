@@ -134,9 +134,9 @@
             <scope>test</scope>
         </dependency-->
         <dependency>
-            <groupId>repository.com.github.springtestdbunit</groupId>
+            <groupId>com.github.springtestdbunit</groupId>
             <artifactId>spring-test-dbunit</artifactId>
-            <version>1.2.3-RELEASE</version>
+            <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
