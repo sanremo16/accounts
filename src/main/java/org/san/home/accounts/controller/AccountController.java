@@ -5,14 +5,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.money.Money;
+import org.san.home.accounts.controller.error.WrapException;
 import org.san.home.accounts.dto.AccountDto;
-import org.san.home.accounts.dto.DtoMapper;
+import org.san.home.accounts.dto.AccountMapper;
 import org.san.home.accounts.dto.MoneyDto;
+import org.san.home.accounts.dto.MoneyMapper;
 import org.san.home.accounts.model.Account;
 import org.san.home.accounts.service.AccountService;
-import org.san.home.accounts.controller.error.WrapException;
-import org.san.home.accounts.service.error.CommonException;
-import org.san.home.accounts.service.error.ErrorArgument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,7 +34,9 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
     @Autowired
-    private DtoMapper mapper;
+    private AccountMapper accountMapper;
+    @Autowired
+    private MoneyMapper moneyMapper;
 
     @ApiOperation(value = "View a list of accounts", response = Iterable.class)
     @WrapException(errorCode = GET_ALL_FAILED)
@@ -43,7 +44,7 @@ public class AccountController {
     @ResponseBody
     public Collection<AccountDto> findAll() {
         return accountService.findAll().stream()
-                .map(account -> mapper.map(account, AccountDto.class))
+                .map(account -> accountMapper.map(account, AccountDto.class))
                 .collect(Collectors.toList());
     }
 
@@ -52,7 +53,7 @@ public class AccountController {
     @GetMapping(value = "/show/{num}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public AccountDto get(@ApiParam(value = "Account number") @PathVariable("num") String num) {
-        return mapper.map(
+        return accountMapper.map(
                 accountService.getByAccountNumber(num),
                 AccountDto.class);
     }
@@ -63,8 +64,8 @@ public class AccountController {
     @ResponseBody
     public AccountDto add(@RequestBody AccountDto accountDto){
         accountDto.setId(null);
-        return mapper.map(
-                accountService.add(mapper.map(accountDto, Account.class)),
+        return accountMapper.map(
+                accountService.add(accountMapper.map(accountDto, Account.class)),
                 AccountDto.class);
     }
 
@@ -73,8 +74,8 @@ public class AccountController {
     @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public AccountDto updateAccount(@RequestBody AccountDto accountDto){
-        return mapper.map(
-                accountService.update(mapper.map(accountDto, Account.class)),
+        return accountMapper.map(
+                accountService.update(accountMapper.map(accountDto, Account.class)),
                 AccountDto.class);
     }
 
@@ -93,9 +94,9 @@ public class AccountController {
     public AccountDto topUp(@ApiParam(value = "Account number") @RequestParam String accountNumber,
                             @ApiParam(value = "Major money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
                             @ApiParam(value = "Minor money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
-        return mapper.map(
+        return accountMapper.map(
                 accountService.topUp(accountNumber,
-                        mapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
+                        moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
                 AccountDto.class);
     }
 
@@ -106,9 +107,9 @@ public class AccountController {
     public AccountDto withdraw(@ApiParam(value = "Account number") @RequestParam String accountNumber,
                                @ApiParam(value = "Major money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
                                @ApiParam(value = "Minor money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
-        return mapper.map(
+        return accountMapper.map(
                 accountService.withdraw(accountNumber,
-                        mapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
+                        moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
                 AccountDto.class);
     }
 
@@ -120,9 +121,9 @@ public class AccountController {
                                @ApiParam(value = "Destination account number") @RequestParam String dstAccountNumber,
                                @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
                                @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
-        return mapper.map(
+        return accountMapper.map(
                 accountService.transfer(srcAccountNumber, dstAccountNumber,
-                        mapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
+                        moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
                 AccountDto.class);
     }
 }
