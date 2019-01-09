@@ -1,0 +1,22 @@
+#git ignore list
+#ignore all class files
+*.class
+#ignore idea configs
+*.iml
+*//*.iml
+#ignore all target folders
+target/
+/.idea/
+/accounts/.idea/libraries/*.xml
+/accounts/.idea/*.xml
+.*.sql
+.*.bat
+.*.xml
+.*.xsd
+.gradle
+.idea
+gradle.properties
+.*.lst
+.*.log
+.release
+unitils-local.properties
