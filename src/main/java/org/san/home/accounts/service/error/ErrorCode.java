@@ -17,7 +17,8 @@ public enum ErrorCode {
     ADD_ACCOUNT_FAILED(10, "add_account_failed"),
     UPDATE_ACCOUNT_FAILED(11, "update_account_failed"),
     DELETE_ACCOUNT_FAILED(12, "delete_account_failed"),
-    UNSUPPORTED_CURRENCY(13, "unsupported_currency");
+    UNSUPPORTED_CURRENCY(13, "unsupported_currency"),
+    VALIDATION_ERROR(14, "validation_error");
 
     private Integer code;
     private String name;

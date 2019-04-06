@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -62,7 +64,7 @@ public class AccountController {
     @WrapException(errorCode = ADD_ACCOUNT_FAILED)
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public AccountDto add(@RequestBody AccountDto accountDto){
+    public AccountDto add(@Valid @RequestBody AccountDto accountDto){
         accountDto.setId(null);
         return accountMapper.map(
                 accountService.add(accountMapper.map(accountDto, Account.class)),
@@ -73,7 +75,7 @@ public class AccountController {
     @WrapException(errorCode = UPDATE_ACCOUNT_FAILED)
     @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public AccountDto updateAccount(@RequestBody AccountDto accountDto){
+    public AccountDto updateAccount(@Valid @RequestBody AccountDto accountDto){
         return accountMapper.map(
                 accountService.update(accountMapper.map(accountDto, Account.class)),
                 AccountDto.class);
@@ -92,8 +94,8 @@ public class AccountController {
     @PostMapping(value = "/topUp", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public AccountDto topUp(@ApiParam(value = "Account number") @RequestParam String accountNumber,
-                            @ApiParam(value = "Major money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
-                            @ApiParam(value = "Minor money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
+                            @ApiParam(value = "Major money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
+                            @ApiParam(value = "Minor money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
         return accountMapper.map(
                 accountService.topUp(accountNumber,
                         moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
@@ -105,8 +107,8 @@ public class AccountController {
     @PostMapping(value = "/withdraw", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public AccountDto withdraw(@ApiParam(value = "Account number") @RequestParam String accountNumber,
-                               @ApiParam(value = "Major money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
-                               @ApiParam(value = "Minor money value") @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
+                               @ApiParam(value = "Major money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
+                               @ApiParam(value = "Minor money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
         return accountMapper.map(
                 accountService.withdraw(accountNumber,
                         moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
@@ -119,8 +121,8 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     public AccountDto transfer(@ApiParam(value = "Source account number") @RequestParam String srcAccountNumber,
                                @ApiParam(value = "Destination account number") @RequestParam String dstAccountNumber,
-                               @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
-                               @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
+                               @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
+                               @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
         return accountMapper.map(
                 accountService.transfer(srcAccountNumber, dstAccountNumber,
                         moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),

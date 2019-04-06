@@ -153,4 +153,18 @@ public class AccountControllerITest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance.major", is(15)));
     }
+
+
+    @Test
+    @DatabaseSetup({"/dataset/account.xml"})
+    public void validationTest() throws Exception {
+        String s = "{\"num\":\"-11111111111111111111\",\"currencyType\":\"USD\"}";
+
+        this.mockMvc.perform(MockMvcRequestBuilders.put("http://localhost:"+ port + "/accounts/update")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(s))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode", is(14)));
+    }
 }

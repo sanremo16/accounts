@@ -1,24 +1,28 @@
 package org.san.home.accounts.controller.error;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.san.home.accounts.service.error.BusinessException;
 import org.san.home.accounts.service.error.CommonException;
 import org.san.home.accounts.service.error.ErrorArgument;
 import org.san.home.accounts.service.error.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.util.*;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
@@ -32,6 +36,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        //return new ResponseEntity<Object>(createDtoException(ex), headers, status);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createDtoException(ex));
+    }
 
     @ExceptionHandler(RestException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -74,6 +83,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             }
 
         return arguments;
+    }
+
+    private ErrorDto createDtoException(@NotNull MethodArgumentNotValidException e) {
+        logger.error(e.getMessage(), e);
+
+        //бежим по стеку и составляем тексты для пользователя и ищем самый глубокий код - первопричину всех бед
+        StringBuilder exceptionText = new StringBuilder(
+                CommonException.getLocalizedMessageFromResource(ErrorCode.VALIDATION_ERROR.getName()));
+        Map<String, Object> arguments = new HashMap<>();
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            arguments.put(fieldName, errorMessage);
+        });
+
+        return new ErrorDto(ErrorCode.VALIDATION_ERROR.getCode(), exceptionText.toString(), arguments, ExceptionUtils.getStackTrace(e));
     }
 
     private ErrorDto createDtoException(@NotNull CommonException e) {
