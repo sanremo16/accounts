@@ -13,6 +13,7 @@ import org.san.home.accounts.dto.MoneyMapper;
 import org.san.home.accounts.model.Account;
 import org.san.home.accounts.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static org.san.home.accounts.service.error.ErrorCode.*;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * @author sanremo16
@@ -44,10 +47,14 @@ public class AccountController {
     @WrapException(errorCode = GET_ALL_FAILED)
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Collection<AccountDto> findAll() {
-        return accountService.findAll().stream()
-                .map(account -> accountMapper.map(account, AccountDto.class))
+    public Collection<Resource<AccountDto>> findAll() {
+        Collection<Resource<AccountDto>> accounts =
+            accountService.findAll().stream()
+                .map(account -> new Resource<>(accountMapper.map(account, AccountDto.class)))
                 .collect(Collectors.toList());
+        accounts.stream().forEach(
+                account -> account.add(linkTo(methodOn(AccountController.class).get(account.getContent().getNum())).withSelfRel()));
+        return accounts;
     }
 
     @ApiOperation(value = "Get account by account number", response = AccountDto.class)
