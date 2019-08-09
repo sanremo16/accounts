@@ -57,14 +57,15 @@ public class AccountController {
         return accounts;
     }
 
-    @ApiOperation(value = "Get account by account number", response = AccountDto.class)
+    @ApiOperation(value = "Get account by account number", response = Resource.class)
     @WrapException(errorCode = GET_ACCOUNT_FAILED)
     @GetMapping(value = "/show/{num}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public AccountDto get(@ApiParam(value = "Account number") @PathVariable("num") String num) {
-        return accountMapper.map(
-                accountService.getByAccountNumber(num),
-                AccountDto.class);
+    public Resource<AccountDto> get(@ApiParam(value = "Account number") @PathVariable("num") String num) {
+        Resource<AccountDto> accRes = new Resource<>(accountMapper.map(
+                accountService.getByAccountNumber(num),AccountDto.class));
+        accRes.add(linkTo(methodOn(AccountController.class).findAll()).withRel("list"));
+        return accRes;
     }
 
     @ApiOperation(value = "Add account", response = AccountDto.class)
