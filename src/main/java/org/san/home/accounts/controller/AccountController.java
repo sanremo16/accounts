@@ -47,6 +47,7 @@ public class AccountController {
     @WrapException(errorCode = GET_ALL_FAILED)
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public Collection<Resource<AccountDto>> findAll() {
         Collection<Resource<AccountDto>> accounts =
             accountService.findAll().stream()
@@ -61,6 +62,7 @@ public class AccountController {
     @WrapException(errorCode = GET_ACCOUNT_FAILED)
     @GetMapping(value = "/show/{num}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public Resource<AccountDto> get(@ApiParam(value = "Account number") @PathVariable("num") String num) {
         Resource<AccountDto> accRes = new Resource<>(accountMapper.map(
                 accountService.getByAccountNumber(num),AccountDto.class));
@@ -72,6 +74,7 @@ public class AccountController {
     @WrapException(errorCode = ADD_ACCOUNT_FAILED)
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     public AccountDto add(@Valid @RequestBody AccountDto accountDto){
         accountDto.setId(null);
         return accountMapper.map(
@@ -83,6 +86,7 @@ public class AccountController {
     @WrapException(errorCode = UPDATE_ACCOUNT_FAILED)
     @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
     public AccountDto updateAccount(@Valid @RequestBody AccountDto accountDto){
         return accountMapper.map(
                 accountService.update(accountMapper.map(accountDto, Account.class)),
@@ -92,6 +96,7 @@ public class AccountController {
     @ApiOperation(value = "Delete account by account number")
     @WrapException(errorCode = DELETE_ACCOUNT_FAILED)
     @RequestMapping(value="/delete/{num}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> delete(@ApiParam(value = "Account number") @PathVariable("num") String num){
         accountService.delete(num);
         return new ResponseEntity(HttpStatus.OK);
