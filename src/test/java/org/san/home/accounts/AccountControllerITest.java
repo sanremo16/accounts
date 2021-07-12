@@ -83,7 +83,7 @@ public class AccountControllerITest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(s))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(1)));
     }
 
