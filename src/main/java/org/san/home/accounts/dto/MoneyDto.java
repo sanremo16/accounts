@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.constraints.PositiveOrZero;
 
@@ -12,7 +13,7 @@ import javax.validation.constraints.PositiveOrZero;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
-public class MoneyDto {
+public class MoneyDto extends RepresentationModel<MoneyDto> {
     @ApiModelProperty(notes = "Major balance value")
     @PositiveOrZero
     private Integer major;

@@ -6,7 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.san.home.accounts.service.error.ErrorArgument;
 import org.san.home.accounts.service.error.ErrorCode;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -56,8 +56,8 @@ public class RestExceptionWrapper {
 
 
     private static String toString(Object o) {
-        return (o instanceof ResourceSupport)
-            ? "Resource{" + o.getClass().getSimpleName() + '}'
+        return (o instanceof RepresentationModel)
+            ? "RepresentationModel{" + o.getClass().getSimpleName() + '}'
             : String.valueOf(o);
     }
 

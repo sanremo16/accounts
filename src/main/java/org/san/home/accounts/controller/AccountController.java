@@ -13,7 +13,7 @@ import org.san.home.accounts.dto.MoneyMapper;
 import org.san.home.accounts.model.Account;
 import org.san.home.accounts.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,8 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static org.san.home.accounts.service.error.ErrorCode.*;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author sanremo16
@@ -45,27 +45,25 @@ public class AccountController {
 
     @ApiOperation(value = "View a list of accounts", response = Iterable.class)
     @WrapException(errorCode = GET_ALL_FAILED)
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/list", produces = { "application/hal+json" })
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Resource<AccountDto>> findAll() {
-        Collection<Resource<AccountDto>> accounts =
+    public CollectionModel<AccountDto> findAll() {
+        Collection<AccountDto> accounts =
             accountService.findAll().stream()
-                .map(account -> new Resource<>(accountMapper.map(account, AccountDto.class)))
+                .map(account -> accountMapper.map(account, AccountDto.class))
+                .map(accountDto -> accountDto.add(linkTo(methodOn(AccountController.class).get(accountDto.getNum())).withSelfRel()))
                 .collect(Collectors.toList());
-        accounts.stream().forEach(
-                account -> account.add(linkTo(methodOn(AccountController.class).get(account.getContent().getNum())).withSelfRel()));
-        return accounts;
+        return CollectionModel.of(accounts, linkTo(methodOn(AccountController.class).findAll()).withSelfRel());
     }
 
-    @ApiOperation(value = "Get account by account number", response = Resource.class)
+    @ApiOperation(value = "Get account by account number", response = AccountDto.class)
     @WrapException(errorCode = GET_ACCOUNT_FAILED)
-    @GetMapping(value = "/show/{num}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/show/{num}", produces = { "application/hal+json" })
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public Resource<AccountDto> get(@ApiParam(value = "Account number") @PathVariable("num") String num) {
-        Resource<AccountDto> accRes = new Resource<>(accountMapper.map(
-                accountService.getByAccountNumber(num),AccountDto.class));
+    public AccountDto get(@ApiParam(value = "Account number") @PathVariable("num") String num) {
+        AccountDto accRes = accountMapper.map(accountService.getByAccountNumber(num), AccountDto.class);
         accRes.add(linkTo(methodOn(AccountController.class).findAll()).withRel("list"));
         return accRes;
     }

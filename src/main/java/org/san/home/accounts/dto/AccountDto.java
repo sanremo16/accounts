@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
@@ -16,7 +17,7 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
-public class AccountDto {
+public class AccountDto extends RepresentationModel<AccountDto> {
     @ApiModelProperty(notes = "The database generated account ID")
     private Long id;
     @ApiModelProperty(notes = "Account number")

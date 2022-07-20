@@ -54,9 +54,9 @@ public class AccountControllerITest {
     public void getAll() throws Exception {
         this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/list")).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[*].id", containsInAnyOrder(100, 200)))
-                .andExpect(jsonPath("$[*].links[*].rel", containsInAnyOrder("self", "self")));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(100, 200)))
+                .andExpect(jsonPath("$.content[*].links[*].rel", containsInAnyOrder("self", "self")));
     }
 
     @Test

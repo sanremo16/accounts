@@ -4,18 +4,23 @@ spring:
         database: h2
         show-sql: true
         hibernate:
-            ddl-auto: create
+            ddl-auto: create-drop
 
     datasource:
         name: accounts
         url: jdbc:h2:mem:mydb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL;INIT=CREATE SCHEMA IF NOT EXISTS accounts
-        data: classpath:/sql/data.sql
+        initialization-mode: always
     h2:
         console:
             enabled: true
             path: /console
     application:
         name: accounts
+    sql:
+        init:
+            data-locations: classpath:/sql/data.sql
+            mode: always
+
 server:
     port: 8082
 management:
