@@ -52,7 +52,7 @@ public class AccountServiceTest {
     public void testWithdraw() {
         BigDecimal minus = new BigDecimal(5);
         Money m = ModelUtils.bigDecimalToMoney(minus, CurrencyType.RUR);
-        Account ac = accountRepository.findById(new Long(100)).get();
+        Account ac = accountRepository.findById(Long.valueOf(100)).get();
         accountService.withdraw(ac.getNum(), m);
         assertEquals(m, ac.getBalance());
     }
@@ -62,7 +62,7 @@ public class AccountServiceTest {
     public void testWithdrawTooMuchMoney() {
         BigDecimal minus = new BigDecimal(15);
         Money m = ModelUtils.bigDecimalToMoney(minus, CurrencyType.RUR);
-        Account ac = accountRepository.findById(new Long(100)).get();
+        Account ac = accountRepository.findById(Long.valueOf(100)).get();
         accountService.withdraw(ac.getNum(), m);
         assertEquals(m.minus(minus), ac.getBalance());
     }
@@ -72,8 +72,8 @@ public class AccountServiceTest {
     public void testTransfer() {
         BigDecimal bd = new BigDecimal(10);
         Money m = ModelUtils.bigDecimalToMoney(bd, CurrencyType.RUR);
-        Account ac1 = accountRepository.findById(new Long(100)).get();
-        Account ac2 = accountRepository.findById(new Long(200)).get();
+        Account ac1 = accountRepository.findById(Long.valueOf(100)).get();
+        Account ac2 = accountRepository.findById(Long.valueOf(200)).get();
         accountService.transfer(ac2.getNum(), ac1.getNum(), m);
         assertEquals(m.plus(bd), ac1.getBalance());
         assertEquals(m, ac2.getBalance());
