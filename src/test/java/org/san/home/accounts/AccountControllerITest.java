@@ -2,6 +2,7 @@ package org.san.home.accounts;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import lombok.SneakyThrows;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.san.home.accounts.service.AccountService;
@@ -50,8 +51,9 @@ public class AccountControllerITest {
 
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void getAll() throws Exception {
+    public void getAll() {
         this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/list")).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
@@ -60,23 +62,26 @@ public class AccountControllerITest {
     }
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void getByAccNum() throws Exception {
+    public void getByAccNum() {
         this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/show/11111111111111111111")).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(100)));
     }
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void delete() throws Exception {
+    public void delete() {
         this.mockMvc.perform(MockMvcRequestBuilders.delete("http://localhost:"+ port + "/accounts/delete/11111111111111111111")).andDo(print())
                 .andExpect(status().isOk());
         assertEquals(1, accountService.findAll().size());
     }
 
     @Test
-    public void add() throws Exception {
+    @SneakyThrows
+    public void add() {
         String s = "{\"num\":\"555\",\"currencyType\":\"USD\"}";
 
         this.mockMvc.perform(MockMvcRequestBuilders.post("http://localhost:"+ port + "/accounts/add")
@@ -88,8 +93,9 @@ public class AccountControllerITest {
     }
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void update() throws Exception {
+    public void update() {
         String s = "{\"num\":\"11111111111111111111\",\"currencyType\":\"USD\"}";
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("http://localhost:"+ port + "/accounts/update")
@@ -101,8 +107,9 @@ public class AccountControllerITest {
      }
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void topUp() throws Exception {
+    public void topUp() {
         this.mockMvc.perform(post("http://localhost:"+ port + "/accounts/topUp")
                 .param("accountNumber", "11111111111111111111")
                 .param("moneyMajor", "10")
@@ -123,8 +130,9 @@ public class AccountControllerITest {
     }
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void withdraw() throws Exception {
+    public void withdraw() {
         this.mockMvc.perform(post("http://localhost:"+ port + "/accounts/withdraw")
                 .param("accountNumber", "11111111111111111111")
                 .param("moneyMajor", "5"))
@@ -134,8 +142,9 @@ public class AccountControllerITest {
     }
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void withdraw_noMoney() throws Exception {
+    public void withdraw_noMoney() {
         this.mockMvc.perform(post("http://localhost:"+ port + "/accounts/withdraw")
                 .param("accountNumber", "11111111111111111111")
                 .param("moneyMajor", "15"))
@@ -144,8 +153,9 @@ public class AccountControllerITest {
     }
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void transfer() throws Exception {
+    public void transfer() {
         this.mockMvc.perform(post("http://localhost:"+ port + "/accounts/transfer")
                 .param("srcAccountNumber", "22222222222222222222")
                 .param("dstAccountNumber", "11111111111111111111")
@@ -157,8 +167,9 @@ public class AccountControllerITest {
 
 
     @Test
+    @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
-    public void validationTest() throws Exception {
+    public void validationTest() {
         String s = "{\"num\":\"-11111111111111111111\",\"currencyType\":\"USD\"}";
 
         this.mockMvc.perform(MockMvcRequestBuilders.put("http://localhost:"+ port + "/accounts/update")
