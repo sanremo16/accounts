@@ -25,20 +25,30 @@ management:
     endpoints:
         web:
             exposure:
-                include: prometheus,health,info,metric
+                include: prometheus,health,info,metrics
     security:
         enabled=false
     endpoint:
         health:
             show-details: always
-            probes:
-                enabled: true
-            group:
-                liveness:
-                    include:
-                        - livenessState
-                readiness:
-                    include:
-                        - readinessState
-                        - accounts
-            enabled: true
+    web:
+        server:
+            request:
+                autotime:
+                    percentiles: 0.9, 0.95
+                metric-name: response_time
+    #metrics:
+    #    distribution:
+    #        percentiles-histogram:
+    #            api:
+    #                request:
+    #                    duration: true
+    #        percentiles:
+    #            api:
+    #                request:
+    #                    duration: 0.9, 0.95
+    #        slo:
+    #            api:
+    #                request:
+    #                    duration: 1ms, 10ms, 100ms, 1s, 5s, 10s
+

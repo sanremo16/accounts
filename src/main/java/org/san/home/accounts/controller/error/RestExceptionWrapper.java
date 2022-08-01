@@ -4,8 +4,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.san.home.accounts.monitoring.MonitoringUtilsService;
 import org.san.home.accounts.service.error.ErrorArgument;
 import org.san.home.accounts.service.error.ErrorCode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.stereotype.Component;
 
@@ -22,18 +24,22 @@ import static com.google.common.collect.Lists.newArrayList;
 @Aspect
 @Component
 public class RestExceptionWrapper {
-
+    @Autowired
+    private MonitoringUtilsService monitoringUtilsService;
 
     @Around("execution(* org.san.home.accounts..*.*(..)) && @annotation(org.san.home.accounts.controller.error.WrapException)")
     public Object defaultException(ProceedingJoinPoint point) throws Throwable {
+        Object result;
         try {
-            return point.proceed();
+            monitoringUtilsService.incrementRequestsActiveCounter();
+            result = point.proceed();
         } catch (Exception e) {
+            monitoringUtilsService.getRequestsFailedCounter().increment();
             MethodSignature methodSignature = (MethodSignature) point.getSignature();
             WrapException a = methodSignature.getMethod().getAnnotation(WrapException.class);
             if (a != null) {
                 List<ErrorArgument> params = newArrayList();
-                String names[] = methodSignature.getParameterNames();
+                String[] names = methodSignature.getParameterNames();
                 List<?> values = Arrays.asList(point.getArgs());
                 if (names != null) {
                     boolean varargs = names.length != values.size();
@@ -51,7 +57,11 @@ public class RestExceptionWrapper {
                 throw new RestException(a.errorCode() != null ? a.errorCode() : ErrorCode.UNDEFINED, e, params);
             }
             throw e;
+        } finally {
+            monitoringUtilsService.decrementRequestsActiveCounter();
         }
+        monitoringUtilsService.getRequestsCounter().increment();
+        return result;
     }
 
 

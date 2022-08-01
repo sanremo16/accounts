@@ -34,7 +34,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/accounts")
 @Slf4j
-@Api(description="Simple API for account's operations")
+@Api("Simple API for account's operations")
 public class AccountController {
     @Autowired
     private AccountService accountService;
