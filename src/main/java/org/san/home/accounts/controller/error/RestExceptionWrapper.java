@@ -31,10 +31,11 @@ public class RestExceptionWrapper {
     public Object defaultException(ProceedingJoinPoint point) throws Throwable {
         Object result;
         try {
-            monitoringUtilsService.incrementRequestsActiveCounter();
+            //monitoringUtilsService.incrementRequestsActiveCounter();
             result = point.proceed();
         } catch (Exception e) {
-            monitoringUtilsService.getRequestsFailedCounter().increment();
+            //monitoringUtilsService.processException(e);
+
             MethodSignature methodSignature = (MethodSignature) point.getSignature();
             WrapException a = methodSignature.getMethod().getAnnotation(WrapException.class);
             if (a != null) {
@@ -58,11 +59,13 @@ public class RestExceptionWrapper {
             }
             throw e;
         } finally {
-            monitoringUtilsService.decrementRequestsActiveCounter();
+            //monitoringUtilsService.decrementRequestsActiveCounter();
         }
-        monitoringUtilsService.getRequestsCounter().increment();
+        //monitoringUtilsService.getSuccessRequestsCounter().increment();
         return result;
     }
+
+
 
 
     private static String toString(Object o) {

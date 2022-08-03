@@ -31,7 +31,7 @@ public class AccountsApplicationTest {
 
     @Test
     public void smoke() throws Exception {
-        this.mockMvc.perform(get("http://localhost:"+ port + "/actuator/health/readiness")).andDo(print())
+        this.mockMvc.perform(get("http://localhost:"+ port + "/actuator/health")).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is("UP")));
     }
