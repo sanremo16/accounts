@@ -2,14 +2,15 @@ package org.san.home.accounts;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.SneakyThrows;
 import org.junit.Test;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
+import org.san.home.accounts.monitoring.MonitoringServletFilter;
 import org.san.home.accounts.monitoring.MonitoringUtilsService;
 import org.san.home.accounts.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,9 +52,6 @@ public class AccountMetricsTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private AccountService accountService;
 
     @Autowired
     MeterRegistry registry;
@@ -84,9 +84,28 @@ public class AccountMetricsTest {
     }
 
     private double getMeterValue(String meterName) {
-        return ((SimpleMeterRegistry)registry).getMeters().stream()
+        Optional<Meter> meter = registry.getMeters().stream()
                 .filter((m -> meterName.equals(m.getId().getName())))
-                .findFirst().get().measure().iterator().next().getValue();
+                .findFirst();
+        return meter.isPresent() ? meter.get().measure().iterator().next().getValue() : 0d;
+    }
+
+    private String getMeterTagValue(String meterName, String tagName) {
+        return registry.getMeters().stream()
+                .filter((m -> meterName.equals(m.getId().getName())))
+                .findFirst().get().getId().getTag(tagName);
+    }
+
+
+    @Test
+    @Order(3)
+    @SneakyThrows
+    public void meterWithSourceHeader() {
+        this.mockMvc.perform(
+                MyTestRequestFactory.get("http://localhost:"+ port + "/accounts/list",
+                    MonitoringServletFilter.SOURCE_HEADER_NAME, "source1")).andDo(print());
+        //registry.getMeters().stream().peek(m -> System.out.println(m.getId() + ", " + m.getId().getTag(MonitoringUtilsService.SOURCE_TAG_NAME))).collect(Collectors.toList());
+        assertEquals("source1", getMeterTagValue(MonitoringUtilsService.SUCCESS_REQ_COUNTER_METRIC_NAME, MonitoringUtilsService.SOURCE_TAG_NAME));
     }
 
 }
