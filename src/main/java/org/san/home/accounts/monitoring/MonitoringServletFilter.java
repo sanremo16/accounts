@@ -30,6 +30,7 @@ public class MonitoringServletFilter implements Filter {
             chain.doFilter(request, response);
         } finally {
             processHttpResponseStatus((HttpServletRequest) request, (HttpServletResponse) response);
+            setSizeMetrics((HttpServletRequest) request, (HttpServletResponse) response);
             monitoringUtilsService.decrementRequestsActiveCounter();
         }
     }
@@ -47,4 +48,16 @@ public class MonitoringServletFilter implements Filter {
             monitoringUtilsService.getRequestsFailedCounter().getOrCreate(source).increment();
         }
     }
+
+    private void setSizeMetrics(HttpServletRequest request, HttpServletResponse response) {
+        monitoringUtilsService.getRequestSizeDistribution()
+                .record(Long.parseLong(Objects.requireNonNullElse(request.getHeader("Content-Length"), "0")));
+        /**
+         * FixMe
+         * doesn't work, reflection can be used https://stackoverflow.com/questions/41744113/how-to-get-total-size-of-httpservletresponse
+         */
+        monitoringUtilsService.getResponseSizeDistribution()
+                .record(Long.parseLong(Objects.requireNonNullElse(response.getHeader("Content-Length"), "0")));
+    }
+
 }

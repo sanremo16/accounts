@@ -2,16 +2,18 @@ package org.san.home.accounts.monitoring;
 
 import com.avpines.dynamic.meters.counter.DynamicCounter;
 import com.google.common.base.Throwables;
+import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.aop.TimedAspect;
-import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.config.MeterFilter;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import javax.validation.constraints.NotNull;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,14 +21,32 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 @Component
 public class MonitoringUtilsService {
+    @Getter
+    public enum Metric {
+        SUCCESS_REQ_COUNTER("requests_success", "Success requests counter by http status"),
+        FAILED_REQ_COUNTER("requests_failed", "Failed requests counter without timeout"),
+        TIMEOUT_COUNTER("errors_timeout", "Timeout requests counter without timeout"),
+        ERROR_COUNTER("errors", "Error request  counter without timeout"),
+        REQ_ACTIVE_GAUGE("requests_active", "Active request gauge"),
+        RESP_SIZE_DISTRIBUTION("response_size", "Response size in bytes"),
+        REQ_SIZE_DISTRIBUTION("request_size", "Request size in bytes");
+
+
+        private String name;
+        private String descr;
+
+        Metric(String name, String descr){
+            this.name = name;
+            this.descr = descr;
+        }
+    }
+    public static final String SOURCE_TAG_NAME = "source";
+
     @Autowired
     private MeterRegistry registry;
-    public static final String SUCCESS_REQ_COUNTER_METRIC_NAME = "requests_success";
-    public static final String FAILED_REQ_COUNTER_METRIC_NAME = "requests_failed";
-    public static final String TIMEOUT_COUNTER_METRIC_NAME = "errors_timeout";
-    public static final String ERROR_COUNTER_METRIC_NAME = "errors";
-    public static final String REQ_ACTIVE_GAUGE_METRIC_NAME = "requests_active";
-    public static final String SOURCE_TAG_NAME = "source";
+    @Autowired
+    private DataSource dataSource;
+
 
     private DynamicCounter requestsFailedCounter;
     private DynamicCounter successRequestsCounter;
@@ -34,19 +54,45 @@ public class MonitoringUtilsService {
     private DynamicCounter errorsCounter;
     private Gauge requestsActive;
     private AtomicLong requestsActiveCounter = new AtomicLong(0);
+    private DistributionSummary responseSizeDistribution;
+    private DistributionSummary requestSizeDistribution;
+
 
     public MonitoringUtilsService(MeterRegistry registry) {
         this.registry = registry;
-        successRequestsCounter = buildCounter(SUCCESS_REQ_COUNTER_METRIC_NAME);
-        //successRequestsCounter = registry.counter(SUCCESS_REQ_COUNTER_METRIC_NAME);
-        requestsFailedCounter = buildCounter(FAILED_REQ_COUNTER_METRIC_NAME);
-        timeoutCounter = buildCounter(TIMEOUT_COUNTER_METRIC_NAME);
-        errorsCounter = buildCounter(ERROR_COUNTER_METRIC_NAME);
-        requestsActive = Gauge.builder(REQ_ACTIVE_GAUGE_METRIC_NAME, requestsActiveCounter, AtomicLong::get).register(registry);
+        successRequestsCounter = buildCounter(Metric.SUCCESS_REQ_COUNTER);
+        requestsFailedCounter = buildCounter(Metric.FAILED_REQ_COUNTER);
+        timeoutCounter = buildCounter(Metric.TIMEOUT_COUNTER);
+        errorsCounter = buildCounter(Metric.ERROR_COUNTER);
+        requestsActive = Gauge.builder(Metric.REQ_ACTIVE_GAUGE.getName(), requestsActiveCounter, AtomicLong::get)
+                .description(Metric.REQ_ACTIVE_GAUGE.getDescr()).register(registry);
+        responseSizeDistribution = createSizeDistribution(Metric.RESP_SIZE_DISTRIBUTION);
+        requestSizeDistribution = createSizeDistribution(Metric.REQ_SIZE_DISTRIBUTION);
+
     }
 
-    private DynamicCounter buildCounter(String meterName) {
-        return DynamicCounter.builder(registry, meterName).tagKeys(SOURCE_TAG_NAME).build();
+    private DistributionSummary createSizeDistribution(final Metric metric) {
+        return DistributionSummary
+                .builder(metric.getName())
+                .description(metric.getDescr())
+                .baseUnit("bytes")
+                .scale(100)
+                .register(registry);
+    }
+
+    private DynamicCounter buildCounter(Metric metric) {
+        return DynamicCounter.builder(registry, metric.getName())
+                .customizer(b -> b.description(metric.getDescr()))
+                .tagKeys(SOURCE_TAG_NAME)
+                .build();
+    }
+
+    @PostConstruct
+    public void setupHikariWithMetrics() {
+        if(dataSource instanceof HikariDataSource) {
+            ((HikariDataSource) dataSource).setMetricRegistry(registry);
+            //((HikariDataSource) dataSource).setHealthCheckRegistry(registry);
+        }
     }
 
     @Bean
@@ -72,11 +118,6 @@ public class MonitoringUtilsService {
             timeoutCounter.getOrCreate(source).increment();
         }
     }
-
-    /**public void addLabel(String key, String value) {
-        successRequestsCounter.
-        registry.config().meterFilter(MeterFilter.allaccept()).
-    }*/
 
     /**
      * private void registerMetricsFilter(MeterRegistry registry) {

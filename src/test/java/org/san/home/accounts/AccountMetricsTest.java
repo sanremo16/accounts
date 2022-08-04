@@ -12,7 +12,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
 import org.san.home.accounts.monitoring.MonitoringServletFilter;
 import org.san.home.accounts.monitoring.MonitoringUtilsService;
-import org.san.home.accounts.service.AccountService;
+import static org.san.home.accounts.monitoring.MonitoringUtilsService.Metric;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.web.server.LocalManagementPort;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -62,11 +62,11 @@ public class AccountMetricsTest {
     @DatabaseSetup({"/dataset/account.xml"})
     public void successCounter() {
         this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/list")).andDo(print());
-        assertEquals(1, getMeterValue(MonitoringUtilsService.SUCCESS_REQ_COUNTER_METRIC_NAME));
-        assertEquals(1, getMeterValue(MonitoringUtilsService.FAILED_REQ_COUNTER_METRIC_NAME));
-        assertEquals(1, getMeterValue(MonitoringUtilsService.ERROR_COUNTER_METRIC_NAME));
-        assertEquals(0, getMeterValue(MonitoringUtilsService.TIMEOUT_COUNTER_METRIC_NAME));
-        assertEquals(0, getMeterValue(MonitoringUtilsService.REQ_ACTIVE_GAUGE_METRIC_NAME));
+        assertEquals(1, getMeterValue(Metric.SUCCESS_REQ_COUNTER.getName()));
+        assertEquals(1, getMeterValue(Metric.FAILED_REQ_COUNTER.getName()));
+        assertEquals(1, getMeterValue(Metric.ERROR_COUNTER.getName()));
+        assertEquals(0, getMeterValue(Metric.TIMEOUT_COUNTER.getName()));
+        assertEquals(0, getMeterValue(Metric.REQ_ACTIVE_GAUGE.getName()));
 
     }
 
@@ -75,11 +75,11 @@ public class AccountMetricsTest {
     @SneakyThrows
     public void errorsCounter() {
         this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/show/999")).andDo(print());
-        assertEquals(0, getMeterValue(MonitoringUtilsService.SUCCESS_REQ_COUNTER_METRIC_NAME));
-        assertEquals(1, getMeterValue(MonitoringUtilsService.FAILED_REQ_COUNTER_METRIC_NAME));
-        assertEquals(1, getMeterValue(MonitoringUtilsService.ERROR_COUNTER_METRIC_NAME));
-        assertEquals(0, getMeterValue(MonitoringUtilsService.TIMEOUT_COUNTER_METRIC_NAME));
-        assertEquals(0, getMeterValue(MonitoringUtilsService.REQ_ACTIVE_GAUGE_METRIC_NAME));
+        assertEquals(0, getMeterValue(Metric.SUCCESS_REQ_COUNTER.getName()));
+        assertEquals(1, getMeterValue(Metric.FAILED_REQ_COUNTER.getName()));
+        assertEquals(1, getMeterValue(Metric.ERROR_COUNTER.getName()));
+        assertEquals(0, getMeterValue(Metric.TIMEOUT_COUNTER.getName()));
+        assertEquals(0, getMeterValue(Metric.REQ_ACTIVE_GAUGE.getName()));
 
     }
 
@@ -105,7 +105,7 @@ public class AccountMetricsTest {
                 MyTestRequestFactory.get("http://localhost:"+ port + "/accounts/list",
                     MonitoringServletFilter.SOURCE_HEADER_NAME, "source1")).andDo(print());
         //registry.getMeters().stream().peek(m -> System.out.println(m.getId() + ", " + m.getId().getTag(MonitoringUtilsService.SOURCE_TAG_NAME))).collect(Collectors.toList());
-        assertEquals("source1", getMeterTagValue(MonitoringUtilsService.SUCCESS_REQ_COUNTER_METRIC_NAME, MonitoringUtilsService.SOURCE_TAG_NAME));
+        assertEquals("source1", getMeterTagValue(Metric.SUCCESS_REQ_COUNTER.getName(), MonitoringUtilsService.SOURCE_TAG_NAME));
     }
 
 }
