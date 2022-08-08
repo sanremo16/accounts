@@ -1,5 +1,6 @@
 package org.san.home.accounts.controller;
 
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,6 +44,7 @@ public class AccountController {
     @Autowired
     private MoneyMapper moneyMapper;
 
+    @Timed(value = "findAll", description = "findAll method time")
     @ApiOperation(value = "View a list of accounts", response = Iterable.class)
     @WrapException(errorCode = GET_ALL_FAILED)
     @GetMapping(value = "/list", produces = { "application/hal+json" })

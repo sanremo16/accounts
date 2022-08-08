@@ -30,6 +30,11 @@
                     <id>maven-central</id>
                     <url>https://repo1.maven.org/maven2/</url>
                 </repository>
+                <repository>
+                    <id>localrep</id>
+                    <name>local repository</name>
+                    <url>file:${project.basedir}/lib</url>
+                </repository>
             </repositories>
         </profile>
     </profiles>
