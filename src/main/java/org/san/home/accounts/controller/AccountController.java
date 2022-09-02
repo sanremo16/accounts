@@ -44,7 +44,7 @@ public class AccountController {
     @Autowired
     private MoneyMapper moneyMapper;
 
-    @Timed(value = "findAll", description = "findAll method time")
+    //@Timed(value = "findAll", description = "findAll method time")
     @ApiOperation(value = "View a list of accounts", response = Iterable.class)
     @WrapException(errorCode = GET_ALL_FAILED)
     @GetMapping(value = "/list", produces = { "application/hal+json" })

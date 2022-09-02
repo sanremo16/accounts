@@ -31,24 +31,15 @@ management:
     endpoint:
         health:
             show-details: always
-    web:
-        server:
-            request:
-                autotime:
-                    percentiles: 0.9, 0.95
-                metric-name: response_time
-    #metrics:
-    #    distribution:
-    #        percentiles-histogram:
-    #            api:
-    #                request:
-    #                    duration: true
-    #        percentiles:
-    #            api:
-    #                request:
-    #                    duration: 0.9, 0.95
-    #        slo:
-    #            api:
-    #                request:
-    #                    duration: 1ms, 10ms, 100ms, 1s, 5s, 10s
-
+    #web:
+    #    server:
+    #        request:
+    #            autotime:
+    #                percentiles: 0.9, 0.95
+    #                metric-name: http.server.requests
+    metrics:
+        distribution:
+            percentiles:
+                "[http.server.requests]": 0.9, 0.95
+            #percentiles-histogram:
+                #"[http.server.requests]": true
