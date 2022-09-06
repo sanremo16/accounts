@@ -54,7 +54,7 @@ public class MonitoringServletFilter implements Filter {
                 .record(Long.parseLong(Objects.requireNonNullElse(request.getHeader("Content-Length"), "0")));
         /**
          * FixMe
-         * doesn't work, reflection can be used https://stackoverflow.com/questions/41744113/how-to-get-total-size-of-httpservletresponse
+         * failed, reflection can be used https://stackoverflow.com/questions/41744113/how-to-get-total-size-of-httpservletresponse
          */
         monitoringUtilsService.getResponseSizeDistribution()
                 .record(Long.parseLong(Objects.requireNonNullElse(response.getHeader("Content-Length"), "0")));
