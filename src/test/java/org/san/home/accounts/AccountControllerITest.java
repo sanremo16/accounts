@@ -52,7 +52,7 @@ public class AccountControllerITest {
     @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
     public void getAll() {
-        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/list")).andDo(print())
+        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts")).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.accountDtoList", hasSize(2)))
                 .andExpect(jsonPath("$._embedded.accountDtoList[*].id", containsInAnyOrder(100, 200)))
@@ -63,7 +63,7 @@ public class AccountControllerITest {
     @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
     public void getByAccNum() {
-        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/show/11111111111111111111")).andDo(print())
+        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/11111111111111111111")).andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(100)));
     }
@@ -72,7 +72,7 @@ public class AccountControllerITest {
     @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
     public void delete() {
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("http://localhost:"+ port + "/accounts/delete/11111111111111111111")).andDo(print())
+        this.mockMvc.perform(MockMvcRequestBuilders.delete("http://localhost:"+ port + "/accounts/11111111111111111111")).andDo(print())
                 .andExpect(status().isOk());
         assertEquals(1, accountService.findAll().size());
     }
@@ -82,7 +82,7 @@ public class AccountControllerITest {
     public void add() {
         String s = "{\"num\":\"555\",\"currencyType\":\"USD\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post("http://localhost:"+ port + "/accounts/add")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("http://localhost:"+ port + "/accounts")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(s))
                 .andDo(print())
@@ -96,7 +96,7 @@ public class AccountControllerITest {
     public void update() {
         String s = "{\"num\":\"11111111111111111111\",\"currencyType\":\"USD\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.put("http://localhost:"+ port + "/accounts/update")
+        this.mockMvc.perform(MockMvcRequestBuilders.put("http://localhost:"+ port + "/accounts")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(s))
                 .andDo(print())
@@ -170,7 +170,7 @@ public class AccountControllerITest {
     public void validationTest() {
         String s = "{\"num\":\"-11111111111111111111\",\"currencyType\":\"USD\"}";
 
-        this.mockMvc.perform(MockMvcRequestBuilders.put("http://localhost:"+ port + "/accounts/update")
+        this.mockMvc.perform(MockMvcRequestBuilders.put("http://localhost:"+ port + "/accounts")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(s))
                 .andDo(print())

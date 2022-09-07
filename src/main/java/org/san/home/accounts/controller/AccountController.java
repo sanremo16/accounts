@@ -1,6 +1,5 @@
 package org.san.home.accounts.controller;
 
-import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,31 +46,30 @@ public class AccountController {
     //@Timed(value = "findAll", description = "findAll method time")
     @Operation(summary = "View a list of accounts")
     @WrapException(errorCode = GET_ALL_FAILED)
-    @GetMapping(value = "/list", produces = { "application/hal+json" })
+    @GetMapping(produces = { "application/hal+json" })
     @ResponseStatus(HttpStatus.OK)
-    public CollectionModel<AccountDto> findAll() {
+    public CollectionModel<AccountDto> getAll() {
         Collection<AccountDto> accounts =
             accountService.findAll().stream()
                 .map(account -> accountMapper.map(account, AccountDto.class))
                 .map(accountDto -> accountDto.add(linkTo(methodOn(AccountController.class).get(accountDto.getNum())).withSelfRel()))
                 .collect(Collectors.toList());
-        return CollectionModel.of(accounts, linkTo(methodOn(AccountController.class).findAll()).withSelfRel());
+        return CollectionModel.of(accounts, linkTo(methodOn(AccountController.class).getAll()).withSelfRel());
     }
 
     @Operation(summary = "Get account by account number")
     @WrapException(errorCode = GET_ACCOUNT_FAILED)
-    @GetMapping(value = "/show/{num}", produces = { "application/hal+json" })
+    @GetMapping(value = "/{num}", produces = { "application/hal+json" })
     @ResponseStatus(HttpStatus.OK)
     public AccountDto get(@Parameter(description = "Account number") @PathVariable("num") String num) {
         AccountDto accRes = accountMapper.map(accountService.getByAccountNumber(num), AccountDto.class);
-        accRes.add(linkTo(methodOn(AccountController.class).findAll()).withRel("list"));
+        accRes.add(linkTo(methodOn(AccountController.class).getAll()).withRel("list"));
         return accRes;
     }
 
     @Operation(summary = "Add account")
     @WrapException(errorCode = ADD_ACCOUNT_FAILED)
-    @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public AccountDto add(@Valid @RequestBody AccountDto accountDto){
         accountDto.setId(null);
@@ -82,8 +80,7 @@ public class AccountController {
 
     @Operation(summary = "Update account")
     @WrapException(errorCode = UPDATE_ACCOUNT_FAILED)
-    @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
+    @RequestMapping(method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public AccountDto updateAccount(@Valid @RequestBody AccountDto accountDto){
         return accountMapper.map(
@@ -93,7 +90,7 @@ public class AccountController {
 
     @Operation(summary = "Delete account by account number")
     @WrapException(errorCode = DELETE_ACCOUNT_FAILED)
-    @RequestMapping(value="/delete/{num}", method = RequestMethod.DELETE)
+    @RequestMapping(value="/{num}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<?> delete(@Parameter(description = "Account number")  @PathVariable("num") String num){
         accountService.delete(num);

@@ -99,7 +99,7 @@ public class AccountMetricsTest {
     public void meterWithSourceHeader() {
         registry.clear();
         this.mockMvc.perform(
-                MyTestRequestFactory.get("http://localhost:"+ port + "/accounts/list",
+                MyTestRequestFactory.get("http://localhost:"+ port + "/accounts",
                     MonitoringServletFilter.SOURCE_HEADER_NAME, "source1")).andDo(print());
         registry.getMeters().stream().peek(m -> System.out.println(m.getId() + ", " + m.getId().getTag(MonitoringUtilsService.SOURCE_TAG_NAME))).collect(Collectors.toList());
         assertEquals("source1", getMeterTagValue(Metric.SUCCESS_REQ_COUNTER.getName(), MonitoringUtilsService.SOURCE_TAG_NAME));
