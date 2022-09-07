@@ -23,7 +23,7 @@ public class MonitoringUtilsService {
     public enum Metric {
         SUCCESS_REQ_COUNTER("requests_success", "Success requests counter by http status"),
         FAILED_REQ_COUNTER("requests_failed", "Failed requests counter without timeout"),
-        TIMEOUT_COUNTER("errors_timeout", "Timeout requests counter without timeout"),
+        TIMEOUT_COUNTER("errors_timeout", "Timeout requests counter"),
         ERROR_COUNTER("errors", "Error request  counter without timeout"),
         REQ_ACTIVE_GAUGE("requests_active", "Active request gauge"),
         RESP_SIZE_DISTRIBUTION("response_size", "Response size in bytes"),

@@ -5,6 +5,7 @@ services:
     build: './config/grafana'
     ports:
       - 3000:3000
+    user: "0:0"
     volumes:
       - ./grafana:/var/lib/grafana
     environment:
@@ -18,6 +19,7 @@ services:
     image: prom/prometheus
     ports:
       - 9090:9090
+    user: "0:0"
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./prometheus:/prometheus
