@@ -2,7 +2,6 @@ package org.san.home.accounts.monitoring;
 
 import com.avpines.dynamic.meters.counter.DynamicCounter;
 import com.google.common.base.Throwables;
-import com.zaxxer.hikari.HikariDataSource;
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Gauge;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import javax.validation.constraints.NotNull;
 import java.net.SocketTimeoutException;
@@ -87,13 +85,14 @@ public class MonitoringUtilsService {
                 .build();
     }
 
-    @PostConstruct
+    //is not usefull for Spring boot 2.7.*
+    /**@PostConstruct
     public void setupHikariWithMetrics() {
         if(dataSource instanceof HikariDataSource) {
             ((HikariDataSource) dataSource).setMetricRegistry(registry);
             //((HikariDataSource) dataSource).setHealthCheckRegistry(registry);
         }
-    }
+    }*/
 
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {
@@ -118,27 +117,4 @@ public class MonitoringUtilsService {
             timeoutCounter.getOrCreate(source).increment();
         }
     }
-
-    /**
-     * private void registerMetricsFilter(MeterRegistry registry) {
-     *         registry.config().meterFilter(new MeterFilter() {
-     *             @Override
-     *             public DistributionStatisticConfig configure(Meter.Id id, DistributionStatisticConfig config) {
-     *                 if (id.getName().equals("api.request.duration")) {
-     *                     return DistributionStatisticConfig.builder()
-     *                             .sla(Duration.ofMillis(10).toNanos(),
-     *                                     Duration.ofMillis(25).toNanos(),
-     *                                     Duration.ofMillis(50).toNanos(),
-     *                                     Duration.ofMillis(100).toNanos(),
-     *                                     Duration.ofMillis(500).toNanos(),
-     *                                     Duration.ofMillis(1000).toNanos(),
-     *                                     Duration.ofMillis(5000).toNanos())
-     *                             .build()
-     *                             .merge(config);
-     *                 }
-     *                 return config;
-     *             }
-     *         });
-     *     }
-     */
 }

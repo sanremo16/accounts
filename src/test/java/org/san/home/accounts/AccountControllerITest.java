@@ -21,8 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import javax.transaction.Transactional;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -49,16 +48,15 @@ public class AccountControllerITest {
     @Autowired
     private AccountService accountService;
 
-
     @Test
     @SneakyThrows
     @DatabaseSetup({"/dataset/account.xml"})
     public void getAll() {
         this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/list")).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(100, 200)))
-                .andExpect(jsonPath("$.content[*].links[*].rel", containsInAnyOrder("self", "self")));
+                .andExpect(jsonPath("$._embedded.accountDtoList", hasSize(2)))
+                .andExpect(jsonPath("$._embedded.accountDtoList[*].id", containsInAnyOrder(100, 200)))
+                .andExpect(jsonPath("$._embedded.accountDtoList[*]._links.self.href", hasSize(2)));
     }
 
     @Test

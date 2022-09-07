@@ -4,12 +4,12 @@
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
-            <id>platform-repo</id>
+            <id>dzo</id>
             <username>ankhokhlov.sbt</username>
             <password>dNBKUX0U*</password>
         </server>
         <server>
-            <id>internal</id>
+            <id>dzo-public</id>
             <username>ankhokhlov.sbt</username>
             <password>dNBKUX0U*</password>
         </server>
@@ -23,17 +23,8 @@
             </activation>
             <repositories>
                 <repository>
-                    <id>platform-repo</id>
+                    <id>dzo</id>
                     <url>https://dzo.sw.sbc.space/nexus-ci/repository/sbt_maven/</url>
-                </repository>
-                <repository>
-                    <id>maven-central</id>
-                    <url>https://repo1.maven.org/maven2/</url>
-                </repository>
-                <repository>
-                    <id>localrep</id>
-                    <name>local repository</name>
-                    <url>file:${project.basedir}/lib</url>
                 </repository>
             </repositories>
         </profile>
@@ -41,16 +32,16 @@
 
     <mirrors>
         <mirror>
-            <id>internal</id>
+            <id>dzo-public</id>
             <name>Mirror of central</name>
             <url>https://dzo.sw.sbc.space/nexus-ci/repository/maven-public/</url>
-            <mirrorOf>central</mirrorOf>
+            <mirrorOf>dzo</mirrorOf>
         </mirror>
         <mirror>
-            <id>internal</id>
+            <id>central</id>
             <name>Mirror of central</name>
             <url>https://repo1.maven.org/maven2/</url>
-            <mirrorOf>central</mirrorOf>
+            <mirrorOf>dzo</mirrorOf>
         </mirror>
     </mirrors>
 </settings>

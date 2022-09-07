@@ -1,6 +1,6 @@
 package org.san.home.accounts.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,10 +14,10 @@ import javax.validation.constraints.PositiveOrZero;
 @NoArgsConstructor
 @Slf4j
 public class MoneyDto extends RepresentationModel<MoneyDto> {
-    @ApiModelProperty(notes = "Major balance value")
+    @Schema(description = "Major balance value")
     @PositiveOrZero
     private Integer major;
-    @ApiModelProperty(notes = "Minor balance value")
+    @Schema(description = "Minor balance value")
     @PositiveOrZero
     private Integer minor;
 }

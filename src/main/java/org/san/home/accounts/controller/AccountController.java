@@ -1,9 +1,9 @@
 package org.san.home.accounts.controller;
 
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.money.Money;
 import org.san.home.accounts.controller.error.WrapException;
@@ -35,7 +35,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/accounts")
 @Slf4j
-@Api("Simple API for account's operations")
+@Tag(name = "Simple API for account's operations")
 public class AccountController {
     @Autowired
     private AccountService accountService;
@@ -45,10 +45,9 @@ public class AccountController {
     private MoneyMapper moneyMapper;
 
     //@Timed(value = "findAll", description = "findAll method time")
-    @ApiOperation(value = "View a list of accounts", response = Iterable.class)
+    @Operation(summary = "View a list of accounts")
     @WrapException(errorCode = GET_ALL_FAILED)
     @GetMapping(value = "/list", produces = { "application/hal+json" })
-    @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public CollectionModel<AccountDto> findAll() {
         Collection<AccountDto> accounts =
@@ -59,18 +58,17 @@ public class AccountController {
         return CollectionModel.of(accounts, linkTo(methodOn(AccountController.class).findAll()).withSelfRel());
     }
 
-    @ApiOperation(value = "Get account by account number", response = AccountDto.class)
+    @Operation(summary = "Get account by account number")
     @WrapException(errorCode = GET_ACCOUNT_FAILED)
     @GetMapping(value = "/show/{num}", produces = { "application/hal+json" })
-    @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public AccountDto get(@ApiParam(value = "Account number") @PathVariable("num") String num) {
+    public AccountDto get(@Parameter(description = "Account number") @PathVariable("num") String num) {
         AccountDto accRes = accountMapper.map(accountService.getByAccountNumber(num), AccountDto.class);
         accRes.add(linkTo(methodOn(AccountController.class).findAll()).withRel("list"));
         return accRes;
     }
 
-    @ApiOperation(value = "Add account", response = AccountDto.class)
+    @Operation(summary = "Add account")
     @WrapException(errorCode = ADD_ACCOUNT_FAILED)
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -82,7 +80,7 @@ public class AccountController {
                 AccountDto.class);
     }
 
-    @ApiOperation(value = "Update account", response = AccountDto.class)
+    @Operation(summary = "Update account")
     @WrapException(errorCode = UPDATE_ACCOUNT_FAILED)
     @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -93,47 +91,47 @@ public class AccountController {
                 AccountDto.class);
     }
 
-    @ApiOperation(value = "Delete account by account number")
+    @Operation(summary = "Delete account by account number")
     @WrapException(errorCode = DELETE_ACCOUNT_FAILED)
     @RequestMapping(value="/delete/{num}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<?> delete(@ApiParam(value = "Account number") @PathVariable("num") String num){
+    public ResponseEntity<?> delete(@Parameter(description = "Account number")  @PathVariable("num") String num){
         accountService.delete(num);
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @ApiOperation(value = "TopUp account", response = AccountDto.class)
+    @Operation(summary = "TopUp account")
     @WrapException(errorCode = TOPUP_FAILED)
     @PostMapping(value = "/topUp", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public AccountDto topUp(@ApiParam(value = "Account number") @RequestParam String accountNumber,
-                            @ApiParam(value = "Major money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
-                            @ApiParam(value = "Minor money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
+    public AccountDto topUp(@Parameter(description = "Account number") @RequestParam String accountNumber,
+                            @Parameter(description = "Major money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
+                            @Parameter(description = "Minor money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
         return accountMapper.map(
                 accountService.topUp(accountNumber,
                         moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
                 AccountDto.class);
     }
 
-    @ApiOperation(value = "Withdraw account", response = AccountDto.class)
+    @Operation(summary = "Withdraw account")
     @WrapException(errorCode = WITHDRAW_FAILED)
     @PostMapping(value = "/withdraw", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public AccountDto withdraw(@ApiParam(value = "Account number") @RequestParam String accountNumber,
-                               @ApiParam(value = "Major money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
-                               @ApiParam(value = "Minor money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
+    public AccountDto withdraw(@Parameter(description = "Account number") @RequestParam String accountNumber,
+                               @Parameter(description = "Major money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
+                               @Parameter(description = "Minor money value") @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
         return accountMapper.map(
                 accountService.withdraw(accountNumber,
                         moneyMapper.map(new MoneyDto(moneyMajor, moneyMinor), Money.class)),
                 AccountDto.class);
     }
 
-    @ApiOperation(value = "Transfer money between accounts, return destination account", response = AccountDto.class)
+    @Operation(summary = "Transfer money between accounts, return destination account")
     @WrapException(errorCode = TRANSFER_FAILED)
     @PostMapping(value = "/transfer", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public AccountDto transfer(@ApiParam(value = "Source account number") @RequestParam String srcAccountNumber,
-                               @ApiParam(value = "Destination account number") @RequestParam String dstAccountNumber,
+    public AccountDto transfer(@Parameter(description = "Source account number") @RequestParam String srcAccountNumber,
+                               @Parameter(description = "Destination account number") @RequestParam String dstAccountNumber,
                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMajor,
                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer moneyMinor) {
         return accountMapper.map(

@@ -20,3 +20,6 @@ gradle.properties
 .*.log
 .release
 unitils-local.properties
+#ignore grafana and prometheus
+scripts/grafana
+scripts/prometheus
