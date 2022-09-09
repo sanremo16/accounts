@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 @Component
 public class MonitoringUtilsService {
+
     @Getter
     public enum Metric {
         SUCCESS_REQ_COUNTER("requests_success", "Success requests counter by http status"),
@@ -88,7 +89,7 @@ public class MonitoringUtilsService {
     //is not usefull for Spring boot 2.7.*
     /**@PostConstruct
     public void setupHikariWithMetrics() {
-        if(dataSource instanceof HikariDataSource) {
+        if (dataSource instanceof HikariDataSource) {
             ((HikariDataSource) dataSource).setMetricRegistry(registry);
             //((HikariDataSource) dataSource).setHealthCheckRegistry(registry);
         }

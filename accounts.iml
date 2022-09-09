@@ -129,7 +129,7 @@
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-aop:2.7.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.22" level="project" />
     <orderEntry type="library" name="Maven: org.aspectj:aspectjweaver:1.9.7" level="project" />
-    <orderEntry type="library" name="Maven: com.avpines:dynamic-actuator-meters:0.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.avpines:dynamic-actuator-meters:0.0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.springdoc:springdoc-openapi-ui:1.6.11" level="project" />
     <orderEntry type="library" name="Maven: org.webjars:swagger-ui:4.14.0" level="project" />
     <orderEntry type="library" name="Maven: org.webjars:webjars-locator-core:0.50" level="project" />

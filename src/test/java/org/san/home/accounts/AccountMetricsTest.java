@@ -58,7 +58,7 @@ public class AccountMetricsTest {
     @DatabaseSetup({"/dataset/account.xml"})
     public void successCounter() {
         registry.clear();
-        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/list")).andDo(print());
+        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts")).andDo(print());
         assertEquals(1, getMeterValue(Metric.SUCCESS_REQ_COUNTER.getName()));
         assertEquals(0, getMeterValue(Metric.FAILED_REQ_COUNTER.getName()));
         assertEquals(0, getMeterValue(Metric.ERROR_COUNTER.getName()));
@@ -71,7 +71,7 @@ public class AccountMetricsTest {
     @SneakyThrows
     public void errorsCounter() {
         registry.clear();
-        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/show/999")).andDo(print());
+        this.mockMvc.perform(get("http://localhost:"+ port + "/accounts/999")).andDo(print());
         assertEquals(0, getMeterValue(Metric.SUCCESS_REQ_COUNTER.getName()));
         assertEquals(1, getMeterValue(Metric.FAILED_REQ_COUNTER.getName()));
         assertEquals(1, getMeterValue(Metric.ERROR_COUNTER.getName()));

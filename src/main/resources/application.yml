@@ -1,3 +1,9 @@
+info:
+    app:
+        name: Accounts Application
+        service-id: '@app.service.id@'
+        api-version: '@app.api.version@'
+        release-id: '@version@'
 spring:
     jpa:
         generate-ddl: true
@@ -28,6 +34,8 @@ server:
 management:
     endpoints:
         web:
+            cors:
+                allowed-origins: '*'
             exposure:
                 include: prometheus,health,info,metrics
     security:
@@ -35,21 +43,18 @@ management:
     endpoint:
         health:
             show-details: always
-    #web:
-    #    server:
-    #        request:
-    #            autotime:
-    #                percentiles: 0.9, 0.95
-    #                metric-name: http.server.requests
+            probes:
+               enabled: true
     metrics:
         distribution:
             percentiles:
                 "[http.server.requests]": 0.9, 0.95
                 "[response_size]": 0.9, 0.95
                 "[request_size]": 0.9, 0.95
-            #percentiles-histogram:
-                #"[http.server.requests]": true
+    info:
+        env:
+            enabled: true
+        java:
+            enabled: true
 springdoc:
     show-actuator: false
-    packages-to-scan: org.san.home.accounts.controller
-    pathsToMatch: /accounts/**
